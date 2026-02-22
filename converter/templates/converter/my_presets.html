@@ -1,0 +1,91 @@
+{% extends "converter/base.html" %}
+{% block title %}My Presets{% endblock %}
+
+{% block content %}
+<div class="reveal">
+  <div style="margin-bottom: 4rem">
+    <h2>Conversion Blueprints</h2>
+    <p style="color: var(--muted); margin: 0">Custom configurations for consistent high-quality outputs.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 350px 1fr; gap: 3rem">
+    <!-- Creation Form -->
+    <div>
+      <div class="glass-card" style="padding: 2rem">
+        <h3 style="margin-bottom: 2rem">New Blueprint</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="id_name">Blueprint Name</label>
+            <input type="text" name="name" id="id_name" placeholder="e.g. Master Audio" required>
+          </div>
+
+          <div class="form-group">
+            <label for="id_format">Format</label>
+            <select name="format" id="id_format" required>
+              <option value="mp3">Audio (mp3)</option>
+              <option value="mp4">Video (mp4)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="id_quality">Quality Profile</label>
+            <select name="quality" id="id_quality" required>
+              <option value="low">Standard</option>
+              <option value="medium" selected>Balanced</option>
+              <option value="high">Premium</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%">Register Blueprint</button>
+        </form>
+        {% if error %}
+          <p style="color: var(--danger); margin-top: 1rem; font-size: 0.85rem">{{ error }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Presets List -->
+    <div>
+      <h3 style="margin-bottom: 2rem">Active Blueprints</h3>
+      {% if presets %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Identifier</th>
+              <th>Type</th>
+              <th>Profile</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in presets %}
+            <tr>
+              <td data-label="Identifier" style="font-weight: 700">{{ p.name }}</td>
+              <td data-label="Type">
+                <code style="background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; color: var(--accent2)">
+                  {{ p.format|upper }}
+                </code>
+              </td>
+              <td data-label="Profile"><span style="color: var(--muted)">{{ p.quality|title }}</span></td>
+              <td data-label="Actions">
+                <form method="post" action="{% url 'delete_preset' p.id %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn" style="color: var(--danger); background: none; padding: 0; min-width: auto; font-size: 0.85rem; font-weight: 700">Decommission</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="glass-card" style="padding: 3rem; text-align: center">
+        <p style="color: var(--muted); margin: 0">No active blueprints. Create one on the left.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

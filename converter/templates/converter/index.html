@@ -1,0 +1,202 @@
+{% extends "converter/base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="reveal">
+  <h2>The Ultimate Media Pipeline</h2>
+  <p class="hero-text">Convert your favorite content with lightning speed. High-quality output, zero friction.</p>
+
+  {% if user.is_authenticated %}
+  <div class="glass-card" style="margin-bottom: 3rem">
+    <h3>Apply a Quick Preset</h3>
+    <p style="color: var(--muted); margin-bottom: 2rem">Use your saved configurations to save time.</p>
+
+    {% if presets %}
+    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 220px;">
+        <select id="id_preset_select">
+          <option value="">-- Select a configuration --</option>
+          {% for p in presets %}
+          <option value="{{ p.id }}" data-format="{{ p.format }}" data-quality="{{ p.quality }}">
+            {{ p.name }} ({{ p.format|upper }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="button" id="apply-preset-btn" class="btn btn-secondary">Apply Now</button>
+    </div>
+    <p id="preset-status" style="margin-top: 1rem; font-size: 0.9rem; color: var(--accent2)"></p>
+    {% else %}
+    <p>No presets found. <a href="{% url 'my_presets' %}" style="color: var(--accent2)">Create your first one</a>.</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="glass-card">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem">
+      <div style="width: 48px; height: 48px; background: var(--accent-glow); border-radius: 12px; display: grid; place-items: center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+      </div>
+      <div>
+        <h3 style="margin: 0">New Conversion</h3>
+        <p style="margin: 0; color: var(--muted); font-size: 0.9rem">Paste a YouTube link to get started.</p>
+      </div>
+    </div>
+
+    <form method="post" action="{% url 'convert_page' %}" id="convert-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_url">YouTube URL</label>
+        <input type="text" id="id_url" name="url" placeholder="https://www.youtube.com/watch?v=..." required />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem">
+        <div class="form-group" style="margin: 0">
+          <label for="id_format">Export Format</label>
+          <select name="format" id="id_format" required>
+            <option value="mp3">Audio (MP3)</option>
+            <option value="mp4">Video (MP4)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0">
+          <label for="id_quality">Target Quality</label>
+          <select name="quality" id="id_quality" required>
+            <option value="low">Standard (Low)</option>
+            <option value="medium" selected>Balanced (Medium)</option>
+            <option value="high">Premium (High)</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" id="convert-btn" class="btn btn-primary" style="width: 100%">
+        Start Processing Pipeline
+      </button>
+    </form>
+  </div>
+</div>
+
+<div id="convert-overlay" class="convert-overlay" hidden>
+  <div class="convert-panel">
+    <div class="mascot" aria-hidden="true">
+      <div class="mascot-head">
+        <span class="eye eye-left"></span>
+        <span class="eye eye-right"></span>
+        <span class="mouth"></span>
+        <span class="antenna"></span>
+      </div>
+      <div class="mascot-body">
+        <span class="arm arm-left"></span>
+        <span class="arm arm-right"></span>
+      </div>
+    </div>
+
+    <h3 style="font-size: 1.5rem; margin-top: 1rem">Digital Alchemist at work...</h3>
+    <p id="convert-status-text" style="color: var(--muted)">Initializing stream capture...</p>
+
+    <div class="progress-wrap" style="margin: 2rem 0">
+      <div id="convert-progress-bar" class="progress-bar"></div>
+    </div>
+
+    <div class="progress-meta" style="justify-content: center">
+      <span id="convert-progress-label">0%</span>
+      <span class="pulse-dot"></span>
+      <span style="color: var(--accent2); font-weight: 700">STAY WITH US</span>
+    </div>
+  </div>
+</div>
+
+{% if error %}
+<div class="glass-card" style="margin-top: 2rem; border-color: var(--danger); background: rgba(255, 77, 109, 0.05)">
+  <p style="color: var(--danger); margin: 0; font-weight: 700">Error: {{ error }}</p>
+</div>
+{% endif %}
+
+{% if converted_file_url %}
+<div class="glass-card reveal" style="margin-top: 2rem; border-color: var(--ok); background: rgba(34, 197, 94, 0.05)">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+    <p style="color: var(--ok); margin: 0; font-weight: 700">Success! Your file is ready.</p>
+    <a href="{{ converted_file_url }}" class="btn btn-primary" style="padding: 0.75rem 1.5rem">Download Now</a>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  (function () {
+    // Preset logic
+    const presetSelect = document.getElementById("id_preset_select");
+    const applyBtn = document.getElementById("apply-preset-btn");
+    const formatSelect = document.getElementById("id_format");
+    const qualitySelect = document.getElementById("id_quality");
+    const statusText = document.getElementById("preset-status");
+
+    if (presetSelect && applyBtn && formatSelect && qualitySelect && statusText) {
+      applyBtn.addEventListener("click", () => {
+        const selected = presetSelect.options[presetSelect.selectedIndex];
+        if (!selected || !selected.value) {
+          statusText.textContent = "Please select a preset first.";
+          return;
+        }
+        formatSelect.value = selected.getAttribute("data-format");
+        qualitySelect.value = selected.getAttribute("data-quality");
+        statusText.textContent = `Applied "${selected.text.trim()}" successfully.`;
+      });
+    }
+
+    // Conversion logic
+    const form = document.getElementById("convert-form");
+    const btn = document.getElementById("convert-btn");
+    const overlay = document.getElementById("convert-overlay");
+    const progressBar = document.getElementById("convert-progress-bar");
+    const progressLabel = document.getElementById("convert-progress-label");
+    const statusTxt = document.getElementById("convert-status-text");
+
+    if (!form || !btn || !overlay || !progressBar || !progressLabel || !statusTxt) return;
+
+    let progress = 0;
+    let timer = null;
+
+    const stages = [
+      { at: 5, text: "Contacting source..." },
+      { at: 18, text: "Streaming data chunks..." },
+      { at: 42, text: "Bitrate optimization..." },
+      { at: 60, text: "Transcoding media stream..." },
+      { at: 78, text: "Packaging container..." },
+      { at: 92, text: "Almost there..." },
+    ];
+
+    function setProgress(p) {
+      const safe = Math.max(0, Math.min(98, Math.round(p)));
+      progressBar.style.width = safe + "%";
+      progressLabel.textContent = safe + "%";
+      let current = stages[0].text;
+      for (const s of stages) if (safe >= s.at) current = s.text;
+      statusTxt.textContent = current;
+    }
+
+    form.addEventListener("submit", () => {
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+      overlay.hidden = false;
+
+      progress = 0;
+      setProgress(0);
+
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        if (progress < 40) progress += 2;
+        else if (progress < 80) progress += 1;
+        else progress += 0.2;
+        setProgress(progress);
+      }, 200);
+    });
+
+    window.addEventListener("pageshow", () => {
+      if (timer) clearInterval(timer);
+    });
+  })();
+</script>
+{% endblock %}

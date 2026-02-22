@@ -1,0 +1,119 @@
+{% extends "converter/base.html" %}
+{% block title %}My Downloads{% endblock %}
+
+{% block content %}
+<div class="reveal">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem">
+    <div>
+      <h2>Media Library</h2>
+      <p style="color: var(--muted); margin: 0">Manage your captured media and downloads.</p>
+    </div>
+
+    <div class="glass-card filter-card" style="padding: 1rem 1.5rem; margin: 0">
+      <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
+          {{ filter.form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem; min-width: auto">Filter</button>
+        <a href="{% url 'my_downloads' %}" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; min-width: auto">Reset</a>
+      </form>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 2rem; color: var(--accent2)">Audio Assets (MP3)</h3>
+  {% if mp3_downloads %}
+  <div class="table-wrap" style="margin-bottom: 4rem">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Quality</th>
+          <th>Release Date</th>
+          <th>Access</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in mp3_downloads %}
+        <tr>
+          <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
+          <td data-label="Quality">
+            <span style="background: var(--accent-glow); color: var(--accent); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+              {{ d.quality|upper }}
+            </span>
+          </td>
+          <td data-label="Release Date" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y H:i" }}</td>
+          <td data-label="Access">
+            <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Download</a>
+          </td>
+          <td data-label="Actions">
+            <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              {% if d.id in favorite_ids %}
+                <button type="submit" class="btn" style="color: #fbbf24; background: none; padding: 0; min-width: auto; font-size: 1.25rem" title="Remove from favorites">★</button>
+              {% else %}
+                <button type="submit" class="btn" style="color: var(--muted); background: none; padding: 0; min-width: auto; font-size: 1.25rem" title="Add to favorites">☆</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="glass-card" style="padding: 2rem; text-align: center; margin-bottom: 4rem">
+    <p style="color: var(--muted); margin: 0">No audio assets found.</p>
+  </div>
+  {% endif %}
+
+  <h3 style="margin-bottom: 2rem; color: var(--accent)">Visual Assets (MP4)</h3>
+  {% if mp4_downloads %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Quality</th>
+          <th>Release Date</th>
+          <th>Access</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in mp4_downloads %}
+        <tr>
+          <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
+          <td data-label="Quality">
+            <span style="background: var(--accent2-glow); color: var(--accent2); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+              {{ d.quality|upper }}
+            </span>
+          </td>
+          <td data-label="Release Date" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y H:i" }}</td>
+          <td data-label="Access">
+            <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Download</a>
+          </td>
+          <td data-label="Actions">
+            <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              {% if d.id in favorite_ids %}
+                <button type="submit" class="btn" style="color: #fbbf24; background: none; padding: 0; min-width: auto; font-size: 1.25rem" title="Remove from favorites">★</button>
+              {% else %}
+                <button type="submit" class="btn" style="color: var(--muted); background: none; padding: 0; min-width: auto; font-size: 1.25rem" title="Add to favorites">☆</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="glass-card" style="padding: 2rem; text-align: center">
+    <p style="color: var(--muted); margin: 0">No visual assets found.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

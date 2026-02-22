@@ -1,0 +1,106 @@
+{% extends "converter/base.html" %}
+{% block title %}My Favorites{% endblock %}
+
+{% block content %}
+<div class="reveal">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem">
+    <div>
+      <h2>Premium Collection</h2>
+      <p style="color: var(--muted); margin: 0">Your hand-picked selection of media assets.</p>
+    </div>
+    <div class="glass-card filter-card" style="padding: 1rem 1.5rem; margin: 0">
+       <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
+         {{ filter.form.as_p }}
+         <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem; min-width: auto">Filter</button>
+         <a href="{% url 'my_favorites' %}" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; min-width: auto">Reset</a>
+       </form>
+    </div>
+  </div>
+
+  <h3 style="margin-bottom: 2rem; color: #fbbf24">Starred Audio</h3>
+  {% if mp3_downloads %}
+  <div class="table-wrap" style="margin-bottom: 4rem">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Quality</th>
+          <th>Saved On</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in mp3_downloads %}
+        <tr>
+          <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
+          <td data-label="Quality">
+            <span style="background: var(--accent-glow); color: var(--accent); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+              {{ d.quality|upper }}
+            </span>
+          </td>
+          <td data-label="Saved On" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y" }}</td>
+          <td data-label="Action">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
+              <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Open</a>
+              <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn" style="color: #ff4d6d; background: none; padding: 0; min-width: auto; font-size: 1.1rem" title="Remove">Unstar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="glass-card" style="padding: 2rem; text-align: center; margin-bottom: 4rem">
+    <p style="color: var(--muted); margin: 0">No favorite audio yet.</p>
+  </div>
+  {% endif %}
+
+  <h3 style="margin-bottom: 2rem; color: #fbbf24">Starred Visuals</h3>
+  {% if mp4_downloads %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Quality</th>
+          <th>Saved On</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in mp4_downloads %}
+        <tr>
+          <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
+          <td data-label="Quality">
+            <span style="background: var(--accent2-glow); color: var(--accent2); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+              {{ d.quality|upper }}
+            </span>
+          </td>
+          <td data-label="Saved On" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y" }}</td>
+          <td data-label="Action">
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
+              <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Open</a>
+              <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <button type="submit" class="btn" style="color: #ff4d6d; background: none; padding: 0; min-width: auto; font-size: 1.1rem">Unstar</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="glass-card" style="padding: 2rem; text-align: center">
+    <p style="color: var(--muted); margin: 0">No favorite visuals yet.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
