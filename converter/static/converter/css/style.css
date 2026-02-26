@@ -94,6 +94,7 @@ h2 {
   line-height: 1.08;
   margin-bottom: 1rem;
   background: linear-gradient(135deg, #ffffff 0%, #b8c4d8 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
