@@ -1,0 +1,6 @@
+Django==6.0.1
+djangorestframework==3.16.1
+django-cors-headers==4.9.0
+django-filter==25.2
+ffmpeg-python==0.2.0
+yt-dlp==2025.12.8
