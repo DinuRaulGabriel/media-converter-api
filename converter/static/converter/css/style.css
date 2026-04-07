@@ -1,4 +1,3 @@
-
 :root {
   --bg: #03050c;
   --card: rgba(13, 17, 33, 0.7);
@@ -39,7 +38,7 @@ body {
 
 body {
   margin: 0;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.6;
@@ -256,7 +255,7 @@ button,
 }
 
 .glass-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 45%);
@@ -301,6 +300,22 @@ textarea {
   transition: var(--transition);
 }
 
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select option {
+  color: #111827;
+  background-color: #ffffff;
+}
+
+select option:checked {
+  color: #111827;
+  background-color: #e5e7eb;
+}
+
 textarea {
   resize: vertical;
   min-height: 100px;
@@ -318,6 +333,25 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.06);
   border-color: rgba(124, 58, 237, 0.7);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18);
+}
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::after {
+  content: "⌄";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+  font-size: 1rem;
+}
+
+.select-wrap select {
+  padding-right: 2.5rem;
 }
 
 /* Django form <ul class="errorlist"> support */
@@ -459,13 +493,24 @@ tr:hover td {
 }
 
 @keyframes progressGradient {
-  from { background-position: 0% 50%; }
-  to { background-position: 200% 50%; }
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
 }
 
 @keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.35); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
 }
 
 /* Mascot */
@@ -481,9 +526,9 @@ tr:hover td {
   margin: 0 auto;
   border-radius: 16px;
   position: relative;
-  background: linear-gradient(180deg, rgba(124,58,237,0.25), rgba(14,165,233,0.15));
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.25), rgba(14, 165, 233, 0.15));
   border: 1px solid var(--glass-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .eye {
@@ -493,12 +538,17 @@ tr:hover td {
   height: 8px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 12px rgba(255,255,255,0.7);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
   animation: blink 3.2s infinite;
 }
 
-.eye-left { left: 18px; }
-.eye-right { right: 18px; }
+.eye-left {
+  left: 18px;
+}
+
+.eye-right {
+  right: 18px;
+}
 
 .mouth {
   position: absolute;
@@ -507,7 +557,7 @@ tr:hover td {
   width: 18px;
   height: 8px;
   transform: translateX(-50%);
-  border-bottom: 2px solid rgba(255,255,255,0.9);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.9);
   border-radius: 0 0 10px 10px;
 }
 
@@ -517,7 +567,7 @@ tr:hover td {
   left: 50%;
   width: 2px;
   height: 12px;
-  background: rgba(255,255,255,0.35);
+  background: rgba(255, 255, 255, 0.35);
   transform: translateX(-50%);
 }
 
@@ -540,7 +590,7 @@ tr:hover td {
   margin: 8px auto 0;
   border-radius: 12px;
   position: relative;
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
 }
 
@@ -549,7 +599,7 @@ tr:hover td {
   top: 8px;
   width: 15px;
   height: 2px;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 99px;
 }
 
@@ -566,23 +616,43 @@ tr:hover td {
 }
 
 @keyframes mascotFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 @keyframes blink {
-  0%, 46%, 50%, 100% { transform: scaleY(1); }
-  48% { transform: scaleY(0.1); }
+  0%,
+  46%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.1);
+  }
 }
 
 @keyframes armLeft {
-  from { transform: rotate(14deg); }
-  to { transform: rotate(30deg); }
+  from {
+    transform: rotate(14deg);
+  }
+  to {
+    transform: rotate(30deg);
+  }
 }
 
 @keyframes armRight {
-  from { transform: rotate(-14deg); }
-  to { transform: rotate(-30deg); }
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(-30deg);
+  }
 }
 
 /* Utility helpers for inline layouts you used */

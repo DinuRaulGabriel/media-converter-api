@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from ..forms import CustomUserCreationForm
 from django.contrib.auth import login, logout
 
 from ..filters import DownloadFilter
@@ -238,15 +238,16 @@ def delete_preset(request, preset_id):
 
 def register(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
+            login(request, user, backend="converter.backends.UsernameOrEmailBackend")
             return redirect("home")
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
 
     return render(request, "converter/register.html", {"form": form})
+
 
 
 def logout_view(request):
