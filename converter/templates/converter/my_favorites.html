@@ -1,19 +1,42 @@
-{% extends "converter/base.html" %}
-{% block title %}My Favorites{% endblock %}
-
+{% extends "converter/base.html" %} {% block title %}My Favorites{% endblock %}
 {% block content %}
 <div class="reveal">
-  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem">
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    "
+  >
     <div>
       <h2>Premium Collection</h2>
-      <p style="color: var(--muted); margin: 0">Your hand-picked selection of media assets.</p>
+      <p style="color: var(--muted); margin: 0">
+        Your hand-picked selection of media assets.
+      </p>
     </div>
     <div class="glass-card filter-card" style="padding: 1rem 1.5rem; margin: 0">
-       <form method="get" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
-         {{ filter.form.as_p }}
-         <button type="submit" class="btn btn-primary" style="padding: 0.6rem 1.2rem; min-width: auto">Filter</button>
-         <a href="{% url 'my_favorites' %}" class="btn btn-secondary" style="padding: 0.6rem 1.2rem; min-width: auto">Reset</a>
-       </form>
+      <form
+        method="get"
+        style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap"
+      >
+        {{ filter.form.as_p }}
+        <button
+          type="submit"
+          class="btn btn-primary"
+          style="padding: 0.6rem 1.2rem; min-width: auto"
+        >
+          Filter
+        </button>
+        <a
+          href="{% url 'my_favorites' %}"
+          class="btn btn-secondary"
+          style="padding: 0.6rem 1.2rem; min-width: auto"
+          >Reset</a
+        >
+      </form>
     </div>
   </div>
 
@@ -24,9 +47,9 @@
       <thead>
         <tr>
           <th>Title</th>
-          <th>Quality</th>
-          <th>Saved On</th>
-          <th>Action</th>
+          <th style="padding-left: 24px ; ">Quality</th>
+          <th style="padding-left: 22px;">Saved On</th>
+          <th style="padding-left: 67px">Action</th>
         </tr>
       </thead>
       <tbody>
@@ -34,18 +57,65 @@
         <tr>
           <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
           <td data-label="Quality">
-            <span style="background: var(--accent-glow); color: var(--accent); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+            <span
+              style="
+                background: var(--accent-glow);
+                color: var(--accent);
+                padding: 4px 12px;
+                border-radius: 99px;
+                font-size: 0.75rem;
+                font-weight: 800;
+              "
+            >
               {{ d.quality|upper }}
             </span>
           </td>
-          <td data-label="Saved On" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y" }}</td>
+          <td
+            data-label="Saved On"
+            style="color: var(--muted); font-size: 0.85rem"
+          >
+            {{ d.created_at|date:"d.m.Y" }}
+          </td>
           <td data-label="Action">
-            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
-              <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Open</a>
-              <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <a
+                href="/{{ d.file_path }}"
+                class="btn btn-secondary"
+                style="padding: 6px 16px; min-width: auto; font-size: 0.8rem"
+                >Open</a
+              >
+              <form
+                method="post"
+                action="{% url 'toggle_favorite' d.id %}"
+                style="display: inline"
+              >
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                <button type="submit" class="btn" style="color: #ff4d6d; background: none; padding: 0; min-width: auto; font-size: 1.1rem" title="Remove">Unstar</button>
+                <input
+                  type="hidden"
+                  name="next"
+                  value="{{ request.get_full_path }}"
+                />
+                <button
+                  type="submit"
+                  class="btn"
+                  style="
+                    color: #ff4d6d;
+                    background: none;
+                    padding: 0;
+                    min-width: auto;
+                    font-size: 1.1rem;
+                  "
+                  title="Remove"
+                >
+                  Unstar
+                </button>
               </form>
             </div>
           </td>
@@ -55,7 +125,10 @@
     </table>
   </div>
   {% else %}
-  <div class="glass-card" style="padding: 2rem; text-align: center; margin-bottom: 4rem">
+  <div
+    class="glass-card"
+    style="padding: 2rem; text-align: center; margin-bottom: 4rem"
+  >
     <p style="color: var(--muted); margin: 0">No favorite audio yet.</p>
   </div>
   {% endif %}
@@ -77,18 +150,64 @@
         <tr>
           <td data-label="Title" style="font-weight: 600">{{ d.title }}</td>
           <td data-label="Quality">
-            <span style="background: var(--accent2-glow); color: var(--accent2); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 800">
+            <span
+              style="
+                background: var(--accent2-glow);
+                color: var(--accent2);
+                padding: 4px 12px;
+                border-radius: 99px;
+                font-size: 0.75rem;
+                font-weight: 800;
+              "
+            >
               {{ d.quality|upper }}
             </span>
           </td>
-          <td data-label="Saved On" style="color: var(--muted); font-size: 0.85rem">{{ d.created_at|date:"d.m.Y" }}</td>
+          <td
+            data-label="Saved On"
+            style="color: var(--muted); font-size: 0.85rem"
+          >
+            {{ d.created_at|date:"d.m.Y" }}
+          </td>
           <td data-label="Action">
-            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap">
-              <a href="/{{ d.file_path }}" class="btn btn-secondary" style="padding: 6px 16px; min-width: auto; font-size: 0.8rem">Open</a>
-              <form method="post" action="{% url 'toggle_favorite' d.id %}" style="display:inline;">
+            <div
+              style="
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <a
+                href="/{{ d.file_path }}"
+                class="btn btn-secondary"
+                style="padding: 6px 16px; min-width: auto; font-size: 0.8rem"
+                >Open</a
+              >
+              <form
+                method="post"
+                action="{% url 'toggle_favorite' d.id %}"
+                style="display: inline"
+              >
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                <button type="submit" class="btn" style="color: #ff4d6d; background: none; padding: 0; min-width: auto; font-size: 1.1rem">Unstar</button>
+                <input
+                  type="hidden"
+                  name="next"
+                  value="{{ request.get_full_path }}"
+                />
+                <button
+                  type="submit"
+                  class="btn"
+                  style="
+                    color: #ff4d6d;
+                    background: none;
+                    padding: 0;
+                    min-width: auto;
+                    font-size: 1.1rem;
+                  "
+                >
+                  Unstar
+                </button>
               </form>
             </div>
           </td>

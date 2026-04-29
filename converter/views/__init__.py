@@ -8,5 +8,7 @@ from .web_views import (
     convert_page,
     register,
     logout_view,
+    delete_download,
+    
 )
 from .api_views import VideoInfo, ConvertVideo

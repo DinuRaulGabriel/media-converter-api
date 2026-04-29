@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from ..forms import CustomUserCreationForm
@@ -7,6 +10,22 @@ from ..filters import DownloadFilter
 from ..models import Download, Favorite, ConversionPreset
 from .api_views import ConvertVideo
 
+
+@login_required
+def delete_download(request, download_id):
+    if request.method != "POST":
+        return redirect ("my_downloads")
+
+    download = get_object_or_404(Download, id=download_id, user=request.user)
+
+    file_path = os.path.join(settings.BASE_DIR, download.file_path)
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    download.delete()
+
+    return redirect("my_downloads")
 
 def _index_context(request, **extra):
     """
@@ -101,6 +120,15 @@ def toggle_favorite(request, download_id):
     next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
     return redirect(next_url or "my_downloads")
 
+@login_required 
+def delete_download(request, download_id):
+    if request.method != "POST":
+        return redirect("my_downloads")
+
+    download = get_object_or_404(Download, id= download_id, user=request.user)
+    download.delete()
+
+    return redirect("my_downloads") 
 
 @login_required
 def convert_page(request):

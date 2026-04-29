@@ -32,6 +32,7 @@ from converter.views import (
     logout_view,
     VideoInfo,
     ConvertVideo,
+    delete_download,
 )
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,6 +48,7 @@ urlpatterns = [
     path("favorites/toggle/<int:download_id>/", toggle_favorite, name="toggle_favorite"),
     path("my-presets/", my_presets, name="my_presets"),
     path("presets/delete/<int:preset_id>/", delete_preset, name="delete_preset"),
+    path("downloads/delete/<int:download_id>/", delete_download, name="delete_download"),
     
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Serving media files during development
 
