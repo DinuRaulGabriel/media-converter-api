@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -26,3 +26,15 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
 
         return user
+
+
+class EmailOrUsernameAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        label="Username or Email",
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Username or email",
+                "autofocus": True,
+            }
+        ),
+    )

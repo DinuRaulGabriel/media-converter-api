@@ -19,6 +19,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView
+from converter.forms import EmailOrUsernameAuthenticationForm
 
 from converter.views import (
     home,
@@ -35,20 +36,29 @@ from converter.views import (
     delete_download,
 )
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('convert/', ConvertVideo.as_view(), name='convert_video'),
-    path('get_video_info/', VideoInfo.as_view(), name='get_video_info'),
-    path('convert-page/', convert_page, name='convert_page'),
-    path('login/', LoginView.as_view(template_name='converter/login.html'), name='login'),
+    # Admin
+    path("admin/", admin.site.urls),
+
+    # Auth
+    path("login/", LoginView.as_view(template_name="converter/login.html", authentication_form=EmailOrUsernameAuthenticationForm), name="login"),
     path("register/", register, name="register"),
-    path("logout/", logout_view, name="logout"),        
-    path('', home, name='home'),
+    path("logout/", logout_view, name="logout"),
+
+    # Main pages
+    path("", home, name="home"),
+    path("convert-page/", convert_page, name="convert_page"),
     path("my-downloads/", my_downloads, name="my_downloads"),
     path("my-favorites/", my_favorites, name="my_favorites"),
-    path("favorites/toggle/<int:download_id>/", toggle_favorite, name="toggle_favorite"),
     path("my-presets/", my_presets, name="my_presets"),
-    path("presets/delete/<int:preset_id>/", delete_preset, name="delete_preset"),
+
+    # Actions
+    path("favorites/toggle/<int:download_id>/", toggle_favorite, name="toggle_favorite"),
     path("downloads/delete/<int:download_id>/", delete_download, name="delete_download"),
+    path("presets/delete/<int:preset_id>/", delete_preset, name="delete_preset"),
+
+    # API
+    path("convert/", ConvertVideo.as_view(), name="convert_video"),
+    path("get_video_info/", VideoInfo.as_view(), name="get_video_info"),
     
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Serving media files during development
 
