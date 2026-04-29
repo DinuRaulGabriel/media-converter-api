@@ -25,6 +25,7 @@ def download_video(url, base_name, output_format):
         "outtmpl": outtmpl,
         "noplaylist": True,
         "no_color": True,
+        "remote_components": "ejs:github",
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -69,7 +70,7 @@ def perform_conversion(request, url, output_format, quality):
 
     # 1) extrage info
     try:
-        with yt_dlp.YoutubeDL() as ydl:
+        with yt_dlp.YoutubeDL({"remote_components": "ejs:github"}) as ydl:
             info = ydl.extract_info(url, download=False)
         title = info.get("title", "Unknown Title")
     except Exception as e:

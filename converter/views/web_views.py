@@ -11,22 +11,6 @@ from ..models import Download, Favorite, ConversionPreset
 from .api_views import ConvertVideo
 
 
-@login_required
-def delete_download(request, download_id):
-    if request.method != "POST":
-        return redirect ("my_downloads")
-
-    download = get_object_or_404(Download, id=download_id, user=request.user)
-
-    file_path = os.path.join(settings.BASE_DIR, download.file_path)
-
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-    download.delete()
-
-    return redirect("my_downloads")
-
 def _index_context(request, **extra):
     """
     Context comun pentru index/home ca sa avem mereu presets disponibili,
@@ -120,15 +104,23 @@ def toggle_favorite(request, download_id):
     next_url = request.POST.get("next") or request.META.get("HTTP_REFERER")
     return redirect(next_url or "my_downloads")
 
-@login_required 
+
+@login_required
 def delete_download(request, download_id):
     if request.method != "POST":
         return redirect("my_downloads")
 
-    download = get_object_or_404(Download, id= download_id, user=request.user)
+    download = get_object_or_404(Download, id=download_id, user=request.user)
+
+    file_path = os.path.join(settings.BASE_DIR, download.file_path)
+
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
     download.delete()
 
-    return redirect("my_downloads") 
+    return redirect("my_downloads")
+
 
 @login_required
 def convert_page(request):
@@ -154,7 +146,7 @@ def convert_page(request):
         api_view = ConvertVideo()
 
         # Compatibilitate Django request + DRF APIView
-        # (APIView foloseste request.data, dar request normal Django are request.POST)
+        # APIView foloseste request.data, dar request normal Django are request.POST
         request.data = {"url": url, "format": format_, "quality": quality}
 
         resp = api_view.post(request)
@@ -229,8 +221,11 @@ def my_presets(request):
                 },
             )
 
-        # optional: evitam duplicate pe acelasi nume/user
-        exists = ConversionPreset.objects.filter(user=request.user, name__iexact=name).exists()
+        exists = ConversionPreset.objects.filter(
+            user=request.user,
+            name__iexact=name,
+        ).exists()
+
         if exists:
             presets = ConversionPreset.objects.filter(user=request.user).order_by("-created_at")
             return render(
@@ -275,7 +270,6 @@ def register(request):
         form = CustomUserCreationForm()
 
     return render(request, "converter/register.html", {"form": form})
-
 
 
 def logout_view(request):
