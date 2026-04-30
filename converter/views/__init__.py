@@ -9,6 +9,7 @@ from .web_views import (
     register,
     logout_view,
     delete_download,
+    CustomLoginView,
     
 )
 from .api_views import VideoInfo, ConvertVideo

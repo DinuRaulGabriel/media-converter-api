@@ -3,68 +3,111 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
+<div class="reveal">
+  <div class="glass-card" style="max-width: 480px; margin: 4rem auto; padding: 2rem;">
 
-<div class="reveal" style="max-width: 500px; margin: 4rem auto">
-  <div class="glass-card">
-    <h2 style="text-align: center; margin-bottom: 3rem">Welcome Back</h2>
+    <!-- Titlul cardului de login -->
+    <h2 style="margin-bottom: 0.5rem;">Welcome Back</h2>
 
+    <!-- Text scurt explicativ pentru utilizator -->
+    <p style="color: var(--muted); margin-bottom: 2rem;">
+      Login with your username or email.
+    </p>
+
+    <!-- Formularul de login -->
     <form method="post">
-      {% csrf_token %} {% for field in form %}
-      <div class="form-group">
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }} {% if field.errors %}
-        <p style="color: var(--danger); font-size: 0.8rem; margin-top: 0.5rem">
-          {{ field.errors.0 }}
-        </p>
-        {% endif %}
-      </div>
+      {% csrf_token %}
+
+      <!-- Erori generale de autentificare, de exemplu parola gresita -->
+      {% if form.non_field_errors %}
+        <div style="color: var(--danger); margin-bottom: 1rem;">
+          {{ form.non_field_errors.0 }}
+        </div>
+      {% endif %}
+
+      <!-- Afisarea campurilor din formular: Username/Email si Password -->
+      {% for field in form %}
+        <div style="margin-bottom: 1rem;">
+
+          <!-- Label-ul campului, de exemplu Username or Email / Password -->
+          <label style="display: block; margin-bottom: 0.4rem; font-weight: 700;">
+            {{ field.label }}
+          </label>
+
+          <!-- Zona speciala pentru campul de parola -->
+          {% if field.name == "password" %}
+
+            <!-- Input parola + buton Show/Hide pe acelasi rand -->
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+
+              <!-- Campul de parola propriu-zis -->
+              <div style="flex: 1;">
+                {{ field }}
+              </div>
+
+              <!-- Buton pentru afisarea/ascunderea parolei -->
+              <button
+                type="button"
+                class="btn btn-secondary"
+                style="padding: 0.6rem 1rem; min-width: auto;"
+                onclick="
+                  const input = this.parentElement.querySelector('input');
+
+                  if (input.type === 'password') {
+                    input.type = 'text';
+                    this.textContent = 'Hide';
+                  } else {
+                    input.type = 'password';
+                    this.textContent = 'Show';
+                  }
+                "
+              >
+                Show
+              </button>
+            </div>
+
+          {% else %}
+
+            <!-- Camp normal, aici este Username or Email -->
+            {{ field }}
+
+          {% endif %}
+
+          <!-- Erori specifice pentru fiecare camp -->
+          {% if field.errors %}
+            <p style="color: var(--danger); margin-top: 0.4rem;">
+              {{ field.errors.0 }}
+            </p>
+          {% endif %}
+        </div>
       {% endfor %}
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 10px;
-          font-size: 0.9rem;
-        "
-      >
-        <label
-          style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--muted);
-          "
-        >
-          <input type="checkbox" />
+
+      <!-- Zona Remember me + Forgot password -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 0.5rem; margin-bottom: 1.5rem;">
+
+        <!-- Checkbox Remember me: mentine sesiunea activa mai mult timp -->
+        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--muted);">
+          <input type="checkbox" name="remember_me" style="width: auto;">
           Remember me
         </label>
-        <a href="#" style="color: var(--accent2)"> Forgot password? </a>
+
+        <!-- Link catre pagina de resetare parola -->
+       <a href="{% url 'password_reset' %}">
+          Forgot your password?
+        </a>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary"
-        style="width: 100%; margin-top: 1rem"
-      >
+       
+      <!-- Butonul principal de login -->
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
         Login to Dashboard
       </button>
     </form>
 
-    <div
-      style="
-        margin-top: 2rem;
-        text-align: center;
-        color: var(--muted);
-        font-size: 0.9rem;
-      "
-    >
+    <!-- Link catre pagina de inregistrare -->
+    <p style="color: var(--muted); margin-top: 1.5rem; text-align: center;">
       New here?
-      <a
-        href="{% url 'register' %}"
-        style="color: var(--accent2); font-weight: 700"
-        >Create an account</a
-      >
-    </div>
+      <a href="{% url 'register' %}">Create an account</a>
+    </p>
   </div>
 </div>
 {% endblock %}

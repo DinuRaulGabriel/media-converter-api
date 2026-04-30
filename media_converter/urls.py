@@ -21,6 +21,8 @@ from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView
 from converter.forms import EmailOrUsernameAuthenticationForm
 
+from django.contrib.auth import views as auth_views
+
 from converter.views import (
     home,
     convert_page,
@@ -34,13 +36,47 @@ from converter.views import (
     VideoInfo,
     ConvertVideo,
     delete_download,
+    CustomLoginView,
 )
 urlpatterns = [
+
+    path(
+    "password-reset/",
+    auth_views.PasswordResetView.as_view(
+        template_name="converter/password_reset.html",
+        email_template_name="converter/password_reset_email.html",
+        subject_template_name="converter/password_reset_subject.txt",
+        success_url="/password-reset/done/",
+    ),
+    name="password_reset",
+    ),
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="converter/password_reset_done.html"
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "password-reset-confirm/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="converter/password_reset_confirm.html",
+            success_url="/password-reset-complete/",
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "password-reset-complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="converter/password_reset_complete.html"
+        ),
+        name="password_reset_complete",
+    ),
     # Admin
     path("admin/", admin.site.urls),
 
     # Auth
-    path("login/", LoginView.as_view(template_name="converter/login.html", authentication_form=EmailOrUsernameAuthenticationForm), name="login"),
+    path("login/", CustomLoginView.as_view(), name="login"),
     path("register/", register, name="register"),
     path("logout/", logout_view, name="logout"),
 
@@ -59,6 +95,6 @@ urlpatterns = [
     # API
     path("convert/", ConvertVideo.as_view(), name="convert_video"),
     path("get_video_info/", VideoInfo.as_view(), name="get_video_info"),
-    
+
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Serving media files during development
 

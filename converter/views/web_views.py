@@ -2,10 +2,11 @@ import os
 
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from ..forms import CustomUserCreationForm
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 
+from ..forms import CustomUserCreationForm, EmailOrUsernameAuthenticationForm
 from ..filters import DownloadFilter
 from ..models import Download, Favorite, ConversionPreset
 from .api_views import ConvertVideo
@@ -271,6 +272,21 @@ def register(request):
 
     return render(request, "converter/register.html", {"form": form})
 
+
+class CustomLoginView(LoginView):
+    template_name = "converter/login.html"
+    authentication_form = EmailOrUsernameAuthenticationForm
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        remember_me = self.request.POST.get("remember_me")
+
+        if remember_me:
+            self.request.session.set_expiry(60 * 60 * 24 * 30)  # 30 zile
+        else:
+            self.request.session.set_expiry(0)  # se inchide la inchiderea browserului
+
+        return super().form_valid(form)
 
 def logout_view(request):
     logout(request)
