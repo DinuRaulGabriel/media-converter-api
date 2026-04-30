@@ -104,6 +104,42 @@ Home{% endblock %}
           placeholder="https://www.youtube.com/watch?v=..."
           required
         />
+        
+        <!-- Buton pentru preview video, fara sa porneasca conversia -->
+        <button
+          type="button"
+          id="preview-btn"
+          class="btn btn-secondary"
+          style="margin-top: 1rem; padding: 0.65rem 1.2rem; min-width: auto;"
+        >
+          Preview video info
+        </button>
+      </div>
+
+      <!-- Card pentru afisarea informatiilor video inainte de conversie -->
+      <div
+        id="video-preview"
+        class="glass-card"
+        style="display: none; margin-bottom: 2.5rem; padding: 1rem; border-color: var(--accent2);"
+      >
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <img
+            id="preview-thumbnail"
+            src=""
+            alt="Video thumbnail"
+            style="width: 160px; max-width: 100%; border-radius: 1rem; display: none;"
+          />
+
+          <div style="flex: 1; min-width: 220px;">
+            <h3 id="preview-title" style="margin: 0 0 0.5rem 0;">
+              Video title
+            </h3>
+
+            <p id="preview-duration" style="color: var(--muted); margin: 0;">
+              Duration: unknown
+            </p>
+          </div>
+        </div>
       </div>
 
       <div
@@ -247,6 +283,86 @@ Home{% endblock %}
         formatSelect.value = selected.getAttribute("data-format");
         qualitySelect.value = selected.getAttribute("data-quality");
         statusText.textContent = `Applied "${selected.text.trim()}" successfully.`;
+      });
+    }
+
+    // Video preview logic
+    const previewBtn = document.getElementById("preview-btn");
+    const videoPreview = document.getElementById("video-preview");
+    const previewTitle = document.getElementById("preview-title");
+    const previewDuration = document.getElementById("preview-duration");
+    const previewThumbnail = document.getElementById("preview-thumbnail");
+    const urlInput = document.getElementById("id_url");
+
+    function getCSRFToken() {
+      const tokenInput = document.querySelector("[name=csrfmiddlewaretoken]");
+      return tokenInput ? tokenInput.value : "";
+    }
+
+    function formatDuration(seconds) {
+      if (!seconds) return "Duration: unknown";
+
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+
+      return `Duration: ${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+    }
+
+    if (
+      previewBtn &&
+      videoPreview &&
+      previewTitle &&
+      previewDuration &&
+      previewThumbnail &&
+      urlInput
+    ) {
+      previewBtn.addEventListener("click", async () => {
+        const url = urlInput.value.trim();
+
+        if (!url) {
+          alert("Please enter a YouTube URL first.");
+          return;
+        }
+
+        previewBtn.disabled = true;
+        previewBtn.textContent = "Loading preview...";
+
+        try {
+          const response = await fetch("{% url 'get_video_info' %}", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCSRFToken(),
+            },
+            body: JSON.stringify({
+              url: url,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            alert(data.error || "Could not fetch video info.");
+            return;
+          }
+
+          previewTitle.textContent = data.title || "Unknown title";
+          previewDuration.textContent = formatDuration(data.duration);
+
+          if (data.thumbnail) {
+            previewThumbnail.src = data.thumbnail;
+            previewThumbnail.style.display = "block";
+          } else {
+            previewThumbnail.style.display = "none";
+          }
+
+          videoPreview.style.display = "block";
+        } catch (error) {
+          alert("Something went wrong while fetching video info.");
+        } finally {
+          previewBtn.disabled = false;
+          previewBtn.textContent = "Preview video info";
+        }
       });
     }
 
